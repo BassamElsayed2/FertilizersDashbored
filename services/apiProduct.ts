@@ -80,7 +80,7 @@ export const getProducts = async () => {
 
 export const deleteProduct = async (id: string) => {
   try {
-    const { error } = await supabase.from("products").delete().eq("id", id);
+    const { error } = await supabase.from("product").delete().eq("id", id);
 
     if (error) throw error;
 

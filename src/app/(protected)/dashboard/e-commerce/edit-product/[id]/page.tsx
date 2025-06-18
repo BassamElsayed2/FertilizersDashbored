@@ -39,10 +39,10 @@ const EditProductForm: React.FC<EditProductPageProps> = () => {
   const router = useRouter();
   const params = useParams();
   const id = Array.isArray(params.id) ? params.id[0] : params.id;
+  const [serverImages, setServerImages] = useState<string[]>([]);
+  const [selectedImages, setSelectedImages] = useState<File[]>([]);
   const [loading, setLoading] = useState(true);
   const [product, setProduct] = useState<Product | null>(null);
-  const [selectedImages, setSelectedImages] = useState<File[]>([]);
-  const [previewUrls, setPreviewUrls] = useState<string[]>([]);
   const [contentAr, setContentAr] = useState<string>("");
   const [contentEn, setContentEn] = useState<string>("");
 
@@ -70,7 +70,8 @@ const EditProductForm: React.FC<EditProductPageProps> = () => {
         setValue("yt_code", found.yt_code);
         setContentAr(found.content_ar || "");
         setContentEn(found.content_en || "");
-        setPreviewUrls(found.images || []);
+        setServerImages(found.images || []);
+        setSelectedImages([]);
       } catch {
         toast.error("خطأ في تحميل المنتج");
       } finally {
@@ -80,47 +81,39 @@ const EditProductForm: React.FC<EditProductPageProps> = () => {
     if (id) fetchProduct();
   }, [id, router, setValue]);
 
+  const handleImageChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    if (!e.target.files) return;
+    const filesArray = Array.from(e.target.files);
+    setSelectedImages((prev) => [...prev, ...filesArray]);
+  };
+
+  const handleRemoveServerImage = (index: number) => {
+    setServerImages((prev) => prev.filter((_, i) => i !== index));
+  };
+
+  const handleRemoveSelectedImage = (index: number) => {
+    setSelectedImages((prev) => prev.filter((_, i) => i !== index));
+  };
+
   const onSubmit = async (data: Partial<Product>) => {
     try {
-      // الصور الجديدة فقط (blob:)
-      const newImageFiles = previewUrls
-        .map((url, idx) =>
-          url.startsWith("blob:") ? selectedImages[idx] : null
-        )
-        .filter(Boolean) as File[];
-      // الصور القديمة (ليست blob:)
-      const oldImageUrls = previewUrls.filter(
-        (url) => !url.startsWith("blob:")
-      );
-      // ارفع الصور الجديدة
       let uploadedUrls: string[] = [];
-      if (newImageFiles.length > 0) {
-        uploadedUrls = await uploadProductImages(newImageFiles);
+      if (selectedImages && selectedImages.length > 0) {
+        uploadedUrls = await uploadProductImages(selectedImages);
       }
-      // الصور النهائية
-      const allImages = [...oldImageUrls, ...uploadedUrls];
+      const allImages = [...serverImages, ...uploadedUrls];
       await updateProduct({
         id: id!,
         ...data,
         images: allImages,
+        content_ar: contentAr,
+        content_en: contentEn,
       });
       toast.success("تم تحديث المنتج بنجاح");
       router.push("/dashboard/e-commerce");
     } catch {
       toast.error("حدث خطأ أثناء التحديث");
     }
-  };
-
-  const handleFileChange = (event: React.ChangeEvent<HTMLInputElement>) => {
-    if (event.target.files) {
-      const filesArray = Array.from(event.target.files);
-      setSelectedImages((prevImages) => [...prevImages, ...filesArray]);
-    }
-  };
-
-  const handleRemoveImage = (index: number) => {
-    setSelectedImages((prevImages) => prevImages.filter((_, i) => i !== index));
-    setPreviewUrls((prev) => prev.filter((_, i) => i !== index));
   };
 
   if (loading) return <div className="p-8 text-center">جاري التحميل...</div>;
@@ -272,24 +265,50 @@ const EditProductForm: React.FC<EditProductPageProps> = () => {
                         multiple
                         accept="image/*"
                         className="absolute top-0 left-0 right-0 bottom-0 rounded-md z-[1] opacity-0 cursor-pointer"
-                        onChange={handleFileChange}
+                        onChange={handleImageChange}
                       />
                     </div>
                     {/* Image Previews */}
                     <div className="mt-[10px] flex flex-wrap gap-2">
-                      {previewUrls.map((url, index) => (
-                        <div key={index} className="relative w-[50px] h-[50px]">
+                      {/* صور السيرفر */}
+                      {serverImages.map((url, index) => (
+                        <div
+                          key={`server-${index}`}
+                          className="relative w-[50px] h-[50px]"
+                        >
                           <Image
-                            src={url.startsWith("blob:") ? url : url}
-                            alt="product-preview"
+                            src={url}
+                            alt={`server-img-${index}`}
                             width={50}
                             height={50}
                             className="rounded-md"
                           />
                           <button
                             type="button"
-                            className="absolute top-[-5px] right-[-5px] bg-orange-500 text-white w-[20px] h-[20px] flex items-center justify-center rounded-full text-xs rtl:right-auto rtl:left-[-5px]"
-                            onClick={() => handleRemoveImage(index)}
+                            className="absolute top-[-5px] right-[-5px] bg-red-600 text-white w-[20px] h-[20px] flex items-center justify-center rounded-full text-xs"
+                            onClick={() => handleRemoveServerImage(index)}
+                          >
+                            ✕
+                          </button>
+                        </div>
+                      ))}
+                      {/* صور الرفع الجديدة */}
+                      {selectedImages.map((file, index) => (
+                        <div
+                          key={`selected-${index}`}
+                          className="relative w-[50px] h-[50px]"
+                        >
+                          <Image
+                            src={URL.createObjectURL(file)}
+                            alt={`selected-img-${index}`}
+                            width={50}
+                            height={50}
+                            className="rounded-md"
+                          />
+                          <button
+                            type="button"
+                            className="absolute top-[-5px] right-[-5px] bg-orange-500 text-white w-[20px] h-[20px] flex items-center justify-center rounded-full text-xs"
+                            onClick={() => handleRemoveSelectedImage(index)}
                           >
                             ✕
                           </button>
