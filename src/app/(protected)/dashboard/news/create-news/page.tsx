@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useState } from "react";
 
 import {
   Editor,
@@ -26,30 +26,24 @@ import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { CreateNews, uploadImages } from "../../../../../../services/apiNews";
 import toast from "react-hot-toast";
 import { useRouter } from "next/navigation";
-import { UUID } from "crypto";
 
-import { getCurrentUser } from "../../../../../../services/apiauth";
 import Image from "next/image";
 import Link from "next/link";
 
 type NewsFormValues = {
   title_ar: string;
   title_en: string;
-  category_id: UUID;
-  status: string;
-  publisher_name?: string;
+  category_id: string;
   yt_code?: string;
   content_ar: string;
   content_en: string;
-  user_id: UUID;
   images: File[];
+  user_id?: string;
 };
 
 const CreateNewsForm: React.FC = () => {
   const queryClient = useQueryClient();
   const router = useRouter();
-
-  const [userId, setUserId] = useState<UUID | null>(null);
 
   //get categories
   const { data: categories } = useCategories();
@@ -62,18 +56,6 @@ const CreateNewsForm: React.FC = () => {
     useForm<NewsFormValues>();
 
   const { errors } = formState;
-
-  useEffect(() => {
-    async function fetchUser() {
-      const user = await getCurrentUser();
-      if (user?.id) {
-        setUserId(user.id as UUID);
-        setValue("user_id", user.id as UUID);
-      }
-    }
-
-    fetchUser();
-  }, [setValue]);
 
   const { mutate, isPending } = useMutation({
     mutationFn: CreateNews,
@@ -125,34 +107,29 @@ const CreateNewsForm: React.FC = () => {
   };
 
   const onSubmit = async (data: NewsFormValues) => {
-    if (!userId) {
-      toast.error("حدث خطأ: لم يتم تحديد المستخدم");
-      return;
-    }
-
     // تحقق أن category_id موجود وصحيح
     if (!data.category_id || data.category_id.trim() === "") {
       toast.error("الرجاء اختيار التصنيف");
       return;
     }
-
     // تحقق من وجود صور
     if (selectedImages.length === 0) {
       toast.error("يجب إضافة صورة واحدة على الأقل");
       return;
     }
-
     try {
       setIsUploadingImages(true);
       // ارفع الصور أولاً
       const uploadedImageUrls = await uploadImages(selectedImages);
-
       const finalData = {
-        ...data,
-        user_id: userId,
+        title_ar: data.title_ar,
+        title_en: data.title_en,
+        category_id: data.category_id,
+        yt_code: data.yt_code,
+        content_ar: data.content_ar,
+        content_en: data.content_en,
         images: uploadedImageUrls,
       };
-
       mutate(finalData);
     } catch (error: Error | unknown) {
       toast.error("حدث خطأ أثناء رفع الصور");
@@ -246,8 +223,6 @@ const CreateNewsForm: React.FC = () => {
                     )}
                   </div>
 
-                  <input type="hidden" {...register("user_id")} />
-
                   <div className="mb-[20px] sm:mb-0">
                     <label className="mb-[10px] text-black dark:text-white font-medium block">
                       التصنيف
@@ -265,34 +240,6 @@ const CreateNewsForm: React.FC = () => {
                         </option>
                       ))}
                     </select>
-                  </div>
-
-                  <div className="mb-[20px] sm:mb-0">
-                    <label className="mb-[10px] text-black dark:text-white font-medium block">
-                      الحاله
-                    </label>
-                    <select
-                      className="h-[55px] rounded-md border border-gray-200 dark:border-[#172036] bg-white dark:bg-[#0c1427] px-[13px] block w-full outline-0 cursor-pointer transition-all focus:border-primary-500"
-                      {...register("status")}
-                    >
-                      <option value="">(اختياري) اختر الحالة</option>
-                      <option value="important">مهم</option>
-                      <option value="urgent">عاجل</option>
-                      <option value="trend">رائج</option>
-                    </select>
-                  </div>
-
-                  <div className="mb-[20px] sm:mb-0">
-                    <label className="mb-[10px] text-black dark:text-white font-medium block">
-                      اسم الناشر
-                    </label>
-                    <input
-                      type="text"
-                      className="h-[55px] rounded-md text-black dark:text-white border border-gray-200 dark:border-[#172036] bg-white dark:bg-[#0c1427] px-[17px] block w-full outline-0 transition-all placeholder:text-gray-500 dark:placeholder:text-gray-400 focus:border-primary-500"
-                      placeholder="(اختياري)"
-                      id="publisher_name"
-                      {...register("publisher_name")}
-                    />
                   </div>
 
                   <div className="sm:col-span-2 mb-[20px] sm:mb-0">

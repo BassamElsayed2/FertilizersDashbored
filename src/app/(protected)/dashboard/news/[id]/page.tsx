@@ -36,8 +36,6 @@ interface NewsFormData {
   title_ar: string;
   title_en: string;
   category_id: string;
-  status: string;
-  publisher_name: string;
   yt_code: string;
   content_ar: string;
   content_en: string;
@@ -55,8 +53,6 @@ export default function EditNewsPage() {
       title_ar: "",
       title_en: "",
       category_id: "",
-      status: "",
-      publisher_name: "",
       yt_code: "",
       content_ar: "",
       content_en: "",
@@ -85,8 +81,6 @@ export default function EditNewsPage() {
         title_ar: news.title_ar || "",
         title_en: news.title_en || "",
         category_id: news.category_id?.toString() || "",
-        status: news.status || "",
-        publisher_name: news.publisher_name || "",
         yt_code: news.yt_code || "",
         content_ar: news.content_ar || "",
         content_en: news.content_en || "",
@@ -206,30 +200,6 @@ export default function EditNewsPage() {
                   </div>
                 )}
 
-                {/* الحالة */}
-                <div>
-                  <label className="block font-medium mb-2">الحالة</label>
-                  <select
-                    {...register("status")}
-                    className="h-[55px] rounded-md border border-gray-200 dark:border-[#172036] bg-white dark:bg-[#0c1427] px-[13px] block w-full outline-0 cursor-pointer transition-all focus:border-primary-500"
-                  >
-                    <option value="">اختر الحالة</option>
-                    <option value="important">مهم</option>
-                    <option value="urgent">عاجل</option>
-                  </select>
-                </div>
-
-                {/* اسم الناشر */}
-                <div>
-                  <label
-                    {...register("publisher_name")}
-                    className="block font-medium mb-2"
-                  >
-                    اسم الناشر
-                  </label>
-                  <input className="h-[55px] rounded-md text-black dark:text-white border border-gray-200 dark:border-[#172036] bg-white dark:bg-[#0c1427] px-[17px] block w-full outline-0 transition-all placeholder:text-gray-500 dark:placeholder:text-gray-400 focus:border-primary-500" />
-                </div>
-
                 {/* كود اليوتيوب */}
                 <div>
                   <label className="block font-medium mb-2">كود يوتيوب</label>
@@ -253,8 +223,8 @@ export default function EditNewsPage() {
                           <EditorProvider>
                             <Editor
                               style={{ minHeight: "200px" }}
-                              value={field.value} // القيمة الحالية من useForm
-                              onChange={field.onChange} // تحديث القيمة في useForm
+                              value={field.value}
+                              onChange={field.onChange}
                             >
                               <Toolbar>
                                 <BtnUndo />

@@ -13,7 +13,7 @@ export interface News {
   yt_code?: string;
   created_at?: string;
   id?: string;
-  user_id: string;
+  user_id?: string;
 }
 
 export async function getNews(

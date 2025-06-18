@@ -8,20 +8,6 @@ import { deleteNews, getNews } from "../../../../../services/apiNews";
 import { getCategories } from "../../../../../services/apiCategories";
 import toast from "react-hot-toast";
 
-const statusColors: Record<string, string> = {
-  normal: "bg-primary-50 dark:bg-[#15203c] text-primary-500",
-  important: "bg-success-50 dark:bg-[#15203c] text-success-500",
-  urgent: "bg-danger-50 dark:bg-[#15203c] text-danger-500",
-  trend: "bg-pink-50 dark:bg-[#15203c] text-danger-500",
-};
-
-const statusLabels: Record<string, string> = {
-  normal: "عادي",
-  important: "مهم",
-  urgent: "عاجل",
-  trend: "رائج",
-};
-
 const NewsListTable: React.FC = () => {
   const [selectedCategory, setSelectedCategory] = useState<string>("");
   const [selectedStatus, setSelectedStatus] = useState<string | undefined>(
@@ -214,21 +200,16 @@ const NewsListTable: React.FC = () => {
             <table className="w-full">
               <thead className="text-black dark:text-white">
                 <tr>
-                  {[
-                    "الخبر",
-                    "تاريخ الانشاء",
-                    "التصنيف",
-
-                    "الحالة",
-                    "الاجرائات",
-                  ].map((header) => (
-                    <th
-                      key={header}
-                      className="font-medium ltr:text-left rtl:text-right px-[20px] py-[11px] bg-gray-50 dark:bg-[#15203c] whitespace-nowrap ltr:first:rounded-tl-md ltr:last:rounded-tr-md rtl:first:rounded-tr-md rtl:last:rounded-tl-md"
-                    >
-                      {header}
-                    </th>
-                  ))}
+                  {["الخبر", "تاريخ الانشاء", "التصنيف", "الاجرائات"].map(
+                    (header) => (
+                      <th
+                        key={header}
+                        className="font-medium ltr:text-left rtl:text-right px-[20px] py-[11px] bg-gray-50 dark:bg-[#15203c] whitespace-nowrap ltr:first:rounded-tl-md ltr:last:rounded-tr-md rtl:first:rounded-tr-md rtl:last:rounded-tl-md"
+                      >
+                        {header}
+                      </th>
+                    )
+                  )}
                 </tr>
               </thead>
 
@@ -278,19 +259,6 @@ const NewsListTable: React.FC = () => {
 
                       <td className="ltr:text-left rtl:text-right whitespace-nowrap px-[20px] py-[15px] border-b border-gray-100 dark:border-[#172036] ltr:first:border-l ltr:last:border-r rtl:first:border-r rtl:last:border-l">
                         {categoriesMap[item.category_id] || "غير معروف"}
-                      </td>
-
-                      <td className="ltr:text-left rtl:text-right whitespace-nowrap px-[20px] py-[15px] border-b border-gray-100 dark:border-[#172036] ltr:first:border-l ltr:last:border-r rtl:first:border-r rtl:last:border-l">
-                        <span
-                          className={`px-[8px] py-[3px] inline-block rounded-sm font-medium text-xs dark:bg-[#15203c] ${
-                            statusColors[item.status || "normal"] ??
-                            statusColors["normal"]
-                          }`}
-                        >
-                          {item.status === "" || item.status == null
-                            ? statusLabels["normal"]
-                            : statusLabels[item.status] || item.status}
-                        </span>
                       </td>
 
                       <td className="ltr:text-left rtl:text-right whitespace-nowrap px-[20px] py-[15px] border-b border-gray-100 dark:border-[#172036] ltr:first:border-l ltr:last:border-r rtl:first:border-r rtl:last:border-l">

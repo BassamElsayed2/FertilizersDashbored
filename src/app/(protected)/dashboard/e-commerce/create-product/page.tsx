@@ -6,10 +6,7 @@ import { useForm } from "react-hook-form";
 import { useMutation } from "@tanstack/react-query";
 import { useRouter } from "next/navigation";
 import toast from "react-hot-toast";
-import {
-  createProduct,
-  ProductFormData,
-} from "../../../../../../services/apiProduct";
+import { createProduct } from "../../../../../../services/apiProduct";
 import {
   Editor,
   EditorProvider,
@@ -30,11 +27,19 @@ import {
   Toolbar,
 } from "react-simple-wysiwyg";
 
+// تعريف ProductFormData محلياً مؤقتاً (إلى أن يتحدث الاستيراد)
+type ProductFormData = {
+  title_ar: string;
+  title_en: string;
+  yt_code?: string;
+  images: File[];
+};
+
 const CreateProductForm: React.FC = () => {
   const router = useRouter();
   const [selectedImages, setSelectedImages] = useState<File[]>([]);
-  const [descriptionAr, setDescriptionAr] = useState<string>("");
-  const [descriptionEn, setDescriptionEn] = useState<string>("");
+  const [contentAr, setContentAr] = useState<string>("");
+  const [contentEn, setContentEn] = useState<string>("");
 
   const {
     register,
@@ -61,8 +66,8 @@ const CreateProductForm: React.FC = () => {
     createProductMutation.mutate({
       ...data,
       images: selectedImages,
-      description_ar: descriptionAr,
-      description_en: descriptionEn,
+      content_ar: contentAr,
+      content_en: contentEn,
     });
   };
 
@@ -97,13 +102,13 @@ const CreateProductForm: React.FC = () => {
                     </label>
                     <input
                       type="text"
-                      {...register("name_ar", { required: "هذا الحقل مطلوب" })}
+                      {...register("title_ar", { required: "هذا الحقل مطلوب" })}
                       className="h-[55px] rounded-md text-black dark:text-white border border-gray-200 dark:border-[#172036] bg-white dark:bg-[#0c1427] px-[17px] block w-full outline-0 transition-all placeholder:text-gray-500 dark:placeholder:text-gray-400 focus:border-primary-500"
                       placeholder="مثال: جوجل بكسل 7 برو"
                     />
-                    {errors.name_ar && (
+                    {errors.title_ar && (
                       <span className="text-red-500 text-sm">
-                        {errors.name_ar.message}
+                        {errors.title_ar.message}
                       </span>
                     )}
                   </div>
@@ -114,56 +119,27 @@ const CreateProductForm: React.FC = () => {
                     </label>
                     <input
                       type="text"
-                      {...register("name_en", { required: "هذا الحقل مطلوب" })}
+                      {...register("title_en", { required: "هذا الحقل مطلوب" })}
                       className="h-[55px] rounded-md text-black dark:text-white border border-gray-200 dark:border-[#172036] bg-white dark:bg-[#0c1427] px-[17px] block w-full outline-0 transition-all placeholder:text-gray-500 dark:placeholder:text-gray-400 focus:border-primary-500"
                       placeholder="مثال: Google Pixel 7 Pro"
                     />
-                    {errors.name_en && (
+                    {errors.title_en && (
                       <span className="text-red-500 text-sm">
-                        {errors.name_en.message}
+                        {errors.title_en.message}
                       </span>
                     )}
                   </div>
 
                   <div className="mb-[20px] sm:mb-0">
                     <label className="mb-[10px] text-black dark:text-white font-medium block">
-                      نوع المنتج
+                      كود يوتيوب (اختياري)
                     </label>
-                    <select
-                      {...register("type", { required: "هذا الحقل مطلوب" })}
-                      className="h-[55px] rounded-md border border-gray-200 dark:border-[#172036] bg-white dark:bg-[#0c1427] px-[13px] block w-full outline-0 cursor-pointer transition-all focus:border-primary-500"
-                    >
-                      <option value="">اختر نوع المنتج</option>
-                      <option value="digital">منتج رقمي</option>
-                      <option value="physical">منتج مادي</option>
-                    </select>
-                    {errors.type && (
-                      <span className="text-red-500 text-sm">
-                        {errors.type.message}
-                      </span>
-                    )}
-                  </div>
-
-                  <div className="mb-[20px] sm:mb-0">
-                    <label className="mb-[10px] text-black dark:text-white font-medium block">
-                      الماركة
-                    </label>
-                    <select
-                      {...register("brand", { required: "هذا الحقل مطلوب" })}
-                      className="h-[55px] rounded-md border border-gray-200 dark:border-[#172036] bg-white dark:bg-[#0c1427] px-[13px] block w-full outline-0 cursor-pointer transition-all focus:border-primary-500"
-                    >
-                      <option value="">اختر الماركة</option>
-                      <option value="samsung">سامسونج</option>
-                      <option value="apple">ابل</option>
-                      <option value="huawei">هواوي</option>
-                      <option value="oppo">اوبو</option>
-                      <option value="xiaomi">شومي</option>
-                    </select>
-                    {errors.brand && (
-                      <span className="text-red-500 text-sm">
-                        {errors.brand.message}
-                      </span>
-                    )}
+                    <input
+                      type="text"
+                      {...register("yt_code")}
+                      className="h-[55px] rounded-md text-black dark:text-white border border-gray-200 dark:border-[#172036] bg-white dark:bg-[#0c1427] px-[17px] block w-full outline-0 transition-all placeholder:text-gray-500 dark:placeholder:text-gray-400 focus:border-primary-500"
+                      placeholder="مثال: dQw4w9WgXcQ"
+                    />
                   </div>
 
                   <div className="sm:col-span-2 mb-[20px] sm:mb-0">
@@ -172,9 +148,9 @@ const CreateProductForm: React.FC = () => {
                     </label>
                     <EditorProvider>
                       <Editor
-                        value={descriptionAr}
+                        value={contentAr}
                         onChange={(e: ContentEditableEvent) =>
-                          setDescriptionAr(e.target.value)
+                          setContentAr(e.target.value)
                         }
                         style={{ minHeight: "200px" }}
                         className="rsw-editor"
@@ -207,9 +183,9 @@ const CreateProductForm: React.FC = () => {
                     </label>
                     <EditorProvider>
                       <Editor
-                        value={descriptionEn}
+                        value={contentEn}
                         onChange={(e: ContentEditableEvent) =>
-                          setDescriptionEn(e.target.value)
+                          setContentEn(e.target.value)
                         }
                         style={{ minHeight: "200px" }}
                         className="rsw-editor"
@@ -234,63 +210,6 @@ const CreateProductForm: React.FC = () => {
                         </Toolbar>
                       </Editor>
                     </EditorProvider>
-                  </div>
-
-                  <div className="mb-[20px] sm:mb-0">
-                    <label className="mb-[10px] text-black dark:text-white font-medium block">
-                      السعر
-                    </label>
-                    <input
-                      type="number"
-                      {...register("price", {
-                        required: "هذا الحقل مطلوب",
-                        min: 0,
-                      })}
-                      className="h-[55px] rounded-md text-black dark:text-white border border-gray-200 dark:border-[#172036] bg-white dark:bg-[#0c1427] px-[17px] block w-full outline-0 transition-all placeholder:text-gray-500 dark:placeholder:text-gray-400 focus:border-primary-500"
-                      placeholder="مثال: 99"
-                    />
-                    {errors.price && (
-                      <span className="text-red-500 text-sm">
-                        {errors.price.message}
-                      </span>
-                    )}
-                  </div>
-
-                  <div className="mb-[20px] sm:mb-0">
-                    <label className="mb-[10px] text-black dark:text-white font-medium block">
-                      الكمية المتاحة
-                    </label>
-                    <input
-                      type="number"
-                      {...register("quantity", {
-                        required: "هذا الحقل مطلوب",
-                        min: 0,
-                      })}
-                      className="h-[55px] rounded-md text-black dark:text-white border border-gray-200 dark:border-[#172036] bg-white dark:bg-[#0c1427] px-[17px] block w-full outline-0 transition-all placeholder:text-gray-500 dark:placeholder:text-gray-400 focus:border-primary-500"
-                      placeholder="مثال: 100"
-                    />
-                    {errors.quantity && (
-                      <span className="text-red-500 text-sm">
-                        {errors.quantity.message}
-                      </span>
-                    )}
-                  </div>
-
-                  <div className="mb-[20px] sm:mb-0">
-                    <label className="mb-[10px] text-black dark:text-white font-medium block">
-                      الخصم
-                    </label>
-                    <input
-                      type="number"
-                      {...register("discount", { min: 0, max: 100 })}
-                      className="h-[55px] rounded-md text-black dark:text-white border border-gray-200 dark:border-[#172036] bg-white dark:bg-[#0c1427] px-[17px] block w-full outline-0 transition-all placeholder:text-gray-500 dark:placeholder:text-gray-400 focus:border-primary-500"
-                      placeholder="مثال: 20"
-                    />
-                    {errors.discount && (
-                      <span className="text-red-500 text-sm">
-                        {errors.discount.message}
-                      </span>
-                    )}
                   </div>
 
                   <div className="sm:col-span-2 mb-[20px] sm:mb-0">
