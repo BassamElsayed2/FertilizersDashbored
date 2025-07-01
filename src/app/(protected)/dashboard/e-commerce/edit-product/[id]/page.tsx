@@ -1,7 +1,7 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import { useParams, useRouter } from "next/navigation";
+import { useRouter, useParams } from "next/navigation";
 import Image from "next/image";
 import { useForm } from "react-hook-form";
 import toast from "react-hot-toast";
@@ -31,11 +31,7 @@ import {
   Toolbar,
 } from "react-simple-wysiwyg";
 
-interface EditProductPageProps {
-  params: { id: string };
-}
-
-const EditProductForm: React.FC<EditProductPageProps> = () => {
+const EditProductForm: React.FC = () => {
   const router = useRouter();
   const params = useParams();
   const id = Array.isArray(params.id) ? params.id[0] : params.id;
