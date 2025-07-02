@@ -8,20 +8,27 @@ import "swiper/css/bundle";
 import "./globals.css";
 
 import type { Metadata } from "next";
-import { Inter } from "next/font/google";
+import { Inter, Cairo } from "next/font/google";
 
 import QueryProvider from "@/providers/QueryProvider";
-
 import { Toaster } from "react-hot-toast";
 
+// Initialize fonts
 const inter = Inter({
   variable: "--font-body",
   subsets: ["latin"],
+  display: "swap",
+});
+
+const cairo = Cairo({
+  variable: "--font-cairo",
+  subsets: ["arabic", "latin"],
+  display: "swap",
 });
 
 export const metadata: Metadata = {
-  title: "Trezo - Tailwind Nextjs Admin Dashboard Templat",
-  description: "Tailwind Nextjs Admin Dashboard Templat",
+  title: "المصرية الاسترالية | Powered by ENS",
+  description: "Powered by ENS",
 };
 
 export default function RootLayout({
@@ -31,7 +38,7 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="en" dir="rtl">
-      <body className={`${inter.variable} antialiased`}>
+      <body className={`${inter.variable} ${cairo.variable} antialiased`}>
         <QueryProvider>{children}</QueryProvider>
         <Toaster position="top-center" />
       </body>

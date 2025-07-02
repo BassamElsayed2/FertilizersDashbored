@@ -57,8 +57,8 @@ export default function SiteSettings() {
               <Image
                 src={site_settings.logo_url}
                 alt="Site Logo"
-                width={200}
-                height={200}
+                width={255}
+                height={65}
                 className="mx-auto"
               />
             </div>

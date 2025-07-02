@@ -41,7 +41,7 @@ const SignInForm: React.FC = () => {
 
             <div className="xl:ltr:pl-[90px] xl:rtl:pr-[90px] 2xl:ltr:pl-[120px] 2xl:rtl:pr-[120px] order-1 lg:order-2">
               <Image
-                src="/images/logo-big.svg"
+                src="/images/logo.png"
                 alt="logo"
                 className="inline-block dark:hidden"
                 width={142}
@@ -57,7 +57,8 @@ const SignInForm: React.FC = () => {
 
               <div className="my-[17px] md:my-[25px]">
                 <h1 className="!font-semibold !text-[22px] md:!text-xl lg:!text-2xl !mb-[5px] md:!mb-[7px]">
-                  مرحبا
+                سجل دخولك
+                أنشئ المحتوى، نظّم الصفحات، وتابع كل جديد.
                 </h1>
               </div>
 

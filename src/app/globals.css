@@ -114,6 +114,9 @@
 html,
 body {
   @apply font-body text-sm md:text-base !p-0 !overflow-y-auto text-gray-500 bg-gray-50 leading-normal dark:bg-[#0a0e19] dark:text-gray-400;
+  font-family: "cairo", sans-serif;
+  font-size: 10pt !important;
+
 }
 
 /** Paragraph */
@@ -184,6 +187,7 @@ button {
 
 /* Sidebar */
 .sidebar-area {
+  font-size: 12pt !important;
   @apply w-[260px] ltr:-left-full ltr:xl:left-0 rtl:-right-full rtl:xl:right-0;
 
   .burger-menu {

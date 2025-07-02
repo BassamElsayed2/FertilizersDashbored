@@ -33,12 +33,11 @@ const SidebarMenu: React.FC<SidebarMenuProps> = ({ toggleActive }) => {
             <Image
               src="/images/logo-icon.svg"
               alt="logo-icon"
-              width={26}
-              height={26}
+              width={260}
+              height={50}
+              style={{ width: "300px", height: "50px", objectFit: "contain" }}
             />
-            <span className="font-bold text-black dark:text-white relative ltr:ml-[8px] rtl:mr-[8px] top-px text-xl">
-              Trezo
-            </span>
+         
           </Link>
 
           <button
